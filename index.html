@@ -40,7 +40,7 @@
 
     /* --- MAIN CARD --- */
     .container {
-        background: rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.90);
         backdrop-filter: blur(12px);
         padding: 25px;
         border-radius: 25px;
@@ -86,6 +86,7 @@
         white-space: pre-line;
         overflow-y: auto;
         max-height: 35vh;
+        min-height: 100px; /* Forces box to stay open even if text is slow */
         scroll-behavior: smooth;
     }
     
@@ -148,8 +149,9 @@
         background: #ff6b6b; 
         color: white;
         box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
-        position: relative; /* Allows movement */
-        transition: top 0.3s ease, left 0.3s ease; 
+        position: relative; 
+        transition: top 0.4s ease, left 0.4s ease; 
+        z-index: 100;
     }
 
     .hidden { display: none !important; }
@@ -161,7 +163,7 @@
 <div id="bg-container"></div>
 
 <div class="container">
-    <h1>Wedding Stress? 🤯</h1>
+    <h1 id="mainTitle">Wedding Stress? 🤯</h1>
     <div class="subtitle">Dr. Viku Prescribes:</div>
 
     <button id="startBtn">Get Treatment 💊</button>
@@ -171,7 +173,7 @@
         <div class="message-box" id="typingText"></div>
 
         <div class="gif-container">
-            <img src="https://media.giphy.com/media/l8ooOxhcItdsA/giphy.gif" alt="Warm Hug">
+            <img src="https://media.tenor.com/nK6OHJ8EOmEAAAAi/love-cwtch.gif" alt="Warm Hug">
         </div>
 
         <div class="btn-group">
@@ -182,20 +184,21 @@
 </div>
 
 <script>
-// --- CONFIGURATION ---
+// --- SAFE SELECTION OF ELEMENTS ---
 const startBtn = document.getElementById("startBtn");
 const content = document.getElementById("content");
 const typingText = document.getElementById("typingText");
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
 const musicFrame = document.getElementById("music");
+const mainTitle = document.getElementById("mainTitle");
 
 const message = 
 `My Dearest Seju 🫂
 
 I know things are crazy right now.
 Packing, fittings, relatives calling...
-It's a chaos! 🤯
+It's chaos! 🤯
 
 But pause for 10 seconds.
 This is a virtual "Jadoo Ki Jhappi" from Viku. ✨
@@ -209,7 +212,10 @@ I am sending you all my love.
 
 Need a hug?`;
 
-// TAUNTS for No
+// Convert string to array to handle emojis safely
+const messageArray = Array.from(message);
+
+// TAUNTS
 const taunts = [
     "Stress Level Critical! Hug Required! 🚨",
     "Don't be prickly, come here! 🌵",
@@ -220,9 +226,10 @@ const taunts = [
 ];
 let tauntIndex = 0;
 
-// --- FLOATING BACKGROUND ---
+// --- BACKGROUND ---
 function createBg() {
     const container = document.getElementById('bg-container');
+    if (!container) return; // Safety check
     const el = document.createElement('div');
     el.classList.add('hug-bg');
     const items = ['🫂', '🤗', '💖', '✨', '💆‍♀️'];
@@ -237,13 +244,16 @@ function createBg() {
 }
 setInterval(createBg, 400);
 
-// --- TYPING EFFECT ---
+// --- SAFER TYPING EFFECT ---
 let charIndex = 0;
 function typeEffect() {
-    if (charIndex < message.length) {
-        typingText.textContent += message.charAt(charIndex);
+    if (charIndex < messageArray.length) {
+        // Append the current character (or emoji)
+        typingText.textContent += messageArray[charIndex];
         charIndex++;
+        // Scroll to bottom
         typingText.scrollTop = typingText.scrollHeight; 
+        // Recursive call
         setTimeout(typeEffect, 30); 
     }
 }
@@ -252,23 +262,28 @@ function typeEffect() {
 startBtn.onclick = () => {
     startBtn.style.display = "none";
     content.classList.remove("hidden");
-    document.getElementById("mainTitle").innerText = "Emergency Hug 🫂";
-    // Soft acoustic/lo-fi track
-    musicFrame.src = "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1&loop=1"; 
+    
+    // Safety check for title
+    if (mainTitle) mainTitle.innerText = "Emergency Hug 🫂";
+    
+    // Play music (if allowed)
+    if (musicFrame) musicFrame.src = "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1&loop=1"; 
+    
+    // Start typing
     typeEffect();
 };
 
-// --- NO BUTTON LOGIC (Move & Taunt) ---
+// --- NO BUTTON LOGIC ---
 noBtn.addEventListener('click', (e) => {
     e.preventDefault();
     alert(taunts[tauntIndex % taunts.length]);
     tauntIndex++;
     
-    // Move Button Randomly
-    const maxX = window.innerWidth - noBtn.offsetWidth - 20; 
-    const maxY = window.innerHeight - noBtn.offsetHeight - 20;
-    const randomX = Math.max(10, Math.random() * maxX);
-    const randomY = Math.max(10, Math.random() * maxY);
+    const maxX = window.innerWidth - noBtn.offsetWidth - 40; 
+    const maxY = window.innerHeight - noBtn.offsetHeight - 40;
+    
+    const randomX = Math.max(20, Math.random() * maxX);
+    const randomY = Math.max(20, Math.random() * maxY);
 
     noBtn.style.position = "fixed"; 
     noBtn.style.left = randomX + "px";
@@ -291,11 +306,9 @@ yesBtn.onclick = () => {
             </div>
         </div>
     `;
-    // Speed up floating hearts
     setInterval(createBg, 100);
 };
 </script>
 
 </body>
 </html>
-
