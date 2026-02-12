@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Emergency Hug 🫂</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- RESET & BASICS --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        height: 100vh;
+        height: 100dvh;
+        /* Warm Cozy Gradient */
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+        font-family: 'Nunito', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    /* --- FLOATING ARMS/HEARTS --- */
+    #bg-container {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; z-index: 0;
+    }
+    .hug-bg {
+        position: absolute; opacity: 0.4;
+        animation: floatUp 8s linear infinite;
+        font-size: 24px;
+    }
+    @keyframes floatUp {
+        0% { transform: translateY(110vh) scale(0.8); opacity: 0; }
+        20% { opacity: 0.6; }
+        100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+
+    /* --- MAIN CARD --- */
+    .container {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        padding: 25px;
+        border-radius: 25px;
+        width: 90%;
+        max-width: 380px;
+        max-height: 95vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 40px rgba(255, 100, 100, 0.2);
+        text-align: center;
+        position: relative;
+        z-index: 10;
+        border: 3px solid #fff;
+    }
+
+    h1 {
+        font-family: 'Fredoka', sans-serif;
+        color: #ff6b6b; 
+        margin-bottom: 5px;
+        font-size: 28px;
+        letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    /* --- MESSAGE BOX --- */
+    .message-box {
+        background: #fff5f5;
+        border: 2px dashed #ffb7b2;
+        border-radius: 15px;
+        padding: 15px;
+        margin-bottom: 15px;
+        text-align: left;
+        font-size: 16px;
+        color: #555;
+        line-height: 1.5;
+        white-space: pre-line;
+        overflow-y: auto;
+        max-height: 35vh;
+        scroll-behavior: smooth;
+    }
+    
+    .message-box::-webkit-scrollbar { width: 5px; }
+    .message-box::-webkit-scrollbar-thumb { background: #ffb7b2; border-radius: 10px; }
+
+    /* --- GIF CONTAINER --- */
+    .gif-container {
+        width: 100%;
+        height: 180px;
+        border-radius: 15px;
+        overflow: hidden;
+        margin-bottom: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        flex-shrink: 0;
+    }
+    .gif-container img {
+        width: 100%; height: 100%; object-fit: cover;
+    }
+
+    /* --- BUTTONS --- */
+    .btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        width: 100%;
+        position: relative;
+        min-height: 55px;
+    }
+
+    button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 50px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s;
+        min-width: 120px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    button:active { transform: scale(0.95); }
+
+    #startBtn {
+        width: 100%;
+        background: linear-gradient(to right, #ff758c, #ff7eb3);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+    }
+
+    #yesBtn {
+        background: #4ecdc4; 
+        color: white;
+        box-shadow: 0 4px 10px rgba(78, 205, 196, 0.4);
+        z-index: 20;
+    }
+
+    #noBtn {
+        background: #ff6b6b; 
+        color: white;
+        box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+        position: relative; /* Allows movement */
+        transition: top 0.3s ease, left 0.3s ease; 
+    }
+
+    .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<iframe id="music" allow="autoplay" style="display:none"></iframe>
+<div id="bg-container"></div>
+
+<div class="container">
+    <h1>Wedding Stress? 🤯</h1>
+    <div class="subtitle">Dr. Viku Prescribes:</div>
+
+    <button id="startBtn">Get Treatment 💊</button>
+
+    <div id="content" class="hidden">
+        
+        <div class="message-box" id="typingText"></div>
+
+        <div class="gif-container">
+            <img src="https://media.giphy.com/media/l8ooOxhcItdsA/giphy.gif" alt="Warm Hug">
+        </div>
+
+        <div class="btn-group">
+            <button id="yesBtn">HUG ME! 🫂</button>
+            <button id="noBtn">I'm Busy 📱</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// --- CONFIGURATION ---
+const startBtn = document.getElementById("startBtn");
+const content = document.getElementById("content");
+const typingText = document.getElementById("typingText");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const musicFrame = document.getElementById("music");
+
+const message = 
+`My Dearest Seju 🫂
+
+I know things are crazy right now.
+Packing, fittings, relatives calling...
+It's a chaos! 🤯
+
+But pause for 10 seconds.
+This is a virtual "Jadoo Ki Jhappi" from Viku. ✨
+
+Warmer than our Chai ☕
+Brighter than your Sunflowers 🌻
+And tighter than my hold on my stocks! 😜
+
+Recharge your battery, Bride-to-Be.
+I am sending you all my love.
+
+Need a hug?`;
+
+// TAUNTS for No
+const taunts = [
+    "Stress Level Critical! Hug Required! 🚨",
+    "Don't be prickly, come here! 🌵",
+    "Battery Low... Need Viku Hug! 🔋",
+    "Chittorgarh is too far to refuse! 🏰",
+    "Jadoo Ki Jhappi is mandatory! ✨",
+    "Denied? System Crash! 😵"
+];
+let tauntIndex = 0;
+
+// --- FLOATING BACKGROUND ---
+function createBg() {
+    const container = document.getElementById('bg-container');
+    const el = document.createElement('div');
+    el.classList.add('hug-bg');
+    const items = ['🫂', '🤗', '💖', '✨', '💆‍♀️'];
+    el.innerText = items[Math.floor(Math.random() * items.length)];
+    
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.animationDuration = (Math.random() * 5 + 5) + 's';
+    el.style.fontSize = (Math.random() * 20 + 20) + 'px';
+    
+    container.appendChild(el);
+    setTimeout(() => { el.remove(); }, 8000);
+}
+setInterval(createBg, 400);
+
+// --- TYPING EFFECT ---
+let charIndex = 0;
+function typeEffect() {
+    if (charIndex < message.length) {
+        typingText.textContent += message.charAt(charIndex);
+        charIndex++;
+        typingText.scrollTop = typingText.scrollHeight; 
+        setTimeout(typeEffect, 30); 
+    }
+}
+
+// --- START BUTTON ---
+startBtn.onclick = () => {
+    startBtn.style.display = "none";
+    content.classList.remove("hidden");
+    document.getElementById("mainTitle").innerText = "Emergency Hug 🫂";
+    // Soft acoustic/lo-fi track
+    musicFrame.src = "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1&loop=1"; 
+    typeEffect();
+};
+
+// --- NO BUTTON LOGIC (Move & Taunt) ---
+noBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert(taunts[tauntIndex % taunts.length]);
+    tauntIndex++;
+    
+    // Move Button Randomly
+    const maxX = window.innerWidth - noBtn.offsetWidth - 20; 
+    const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+    const randomX = Math.max(10, Math.random() * maxX);
+    const randomY = Math.max(10, Math.random() * maxY);
+
+    noBtn.style.position = "fixed"; 
+    noBtn.style.left = randomX + "px";
+    noBtn.style.top = randomY + "px";
+});
+
+// --- YES BUTTON SUCCESS ---
+yesBtn.onclick = () => {
+    document.querySelector('.container').innerHTML = `
+        <div>
+            <h1 style="color: #4ecdc4; font-size: 30px;">HUG LOADED! 🔋</h1>
+            <p style="font-size: 18px; color: #555; margin: 15px 0;">
+                Stress deleted.<br>
+                Love installed.<br>
+                <b>See you on the 21st! ❤️</b>
+            </p>
+            <div style="border-radius:15px; overflow:hidden;">
+                <img style="width: 100%; display:block;" 
+                     src="https://media.giphy.com/media/KP7LMrY6E2WPK/giphy.gif">
+            </div>
+        </div>
+    `;
+    // Speed up floating hearts
+    setInterval(createBg, 100);
+};
+</script>
+
+</body>
+</html>
+
